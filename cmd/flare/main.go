@@ -1,13 +1,24 @@
 package main
 
 import (
+	"flare/internal/durable"
 	"flare/internal/handler"
 	"log"
 	"net"
+	"os"
 )
 
 func main() {
-	listener, err := net.Listen("tcp", net.JoinHostPort("localhost", "8080"))
+	args := os.Args
+
+	if len(args) == 2 {
+		durable.GetConfig(args[1])
+	} else {
+		durable.GetConfig("config.json")
+	}
+
+	config := durable.Config
+	listener, err := net.Listen("tcp", net.JoinHostPort(config.Host, config.Port))
 
 	if err != nil {
 		log.Fatal(err)
@@ -15,7 +26,7 @@ func main() {
 
 	defer listener.Close()
 
-	log.Print("Tcp server running on localhost:8080")
+	log.Printf("Tcp server running on %v:%v", config.Host, config.Port)
 
 	for {
 		conn, err := listener.Accept()
