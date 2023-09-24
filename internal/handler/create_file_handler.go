@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"flare/internal/durable"
 	"flare/internal/models"
 	"io"
 	"log"
 	"net"
 	"os"
+	"path/filepath"
 )
 
 func handleCreateFile(conn net.Conn, packetInfo models.PacketInfo) (*os.File, error) {
@@ -26,7 +28,19 @@ func handleCreateFile(conn net.Conn, packetInfo models.PacketInfo) (*os.File, er
 
 	log.Printf("File Name, %v", fileName)
 
-	file, err := os.Create(fileName)
+	filePath := filepath.Join(durable.Config.SaveFolderPath, fileName)
+	dirPath := filepath.Dir(filePath)
+
+	log.Printf("File Path, %v", filePath)
+	log.Printf("Dir Path, %v", dirPath)
+
+	err = os.MkdirAll(dirPath, os.ModeDir)
+
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := os.Create(filePath)
 
 	if err != nil {
 		log.Print(err)
@@ -36,5 +50,4 @@ func handleCreateFile(conn net.Conn, packetInfo models.PacketInfo) (*os.File, er
 	log.Printf("File %v created", fileName)
 
 	return file, nil
-
 }
