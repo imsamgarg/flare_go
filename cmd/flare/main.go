@@ -35,8 +35,8 @@ func main() {
 			log.Fatal(err)
 		}
 
-		connHanlder := handler.NewConnectionHandler()
+		connHandler := handler.NewConnectionHandler()
 
-		go connHanlder.Handle(conn)
+		go connHandler.Handle(conn)
 	}
 }
